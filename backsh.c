@@ -44,12 +44,20 @@ int
 main(int argc, char *argv[])
 {
 	if (argc != 3) {
-		fprintf(stderr, "Usage: %s directory filename\n", argv[0]);
+		fprintf(stderr, "Usage: %s -c directory/filename\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	const char *directory = argv[1];
-	const char *filename = argv[2];
+	char *slash = strrchr(argv[2], '/');
+	if (slash == NULL) {
+		fprintf(stderr, "File path %s does not contain a directory\n", argv[2]);
+		exit(EXIT_FAILURE);
+	}
+
+	const char *directory = argv[2];
+
+	*slash = '\0';
+	const char *filename = slash + 1;;
 
 	// Generate the timestamped file name
 	char timestamp[16]; // YYYYMMDDZHHMMSS\0
@@ -67,7 +75,7 @@ main(int argc, char *argv[])
 	// Open the file for writing
 	int fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (fd == -1)
-		error_exit("Error opening file");
+		error_exit(filepath);
 
 	// Read from stdin and write to the file
 	char buffer[BUFFER_SIZE];

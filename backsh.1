@@ -4,8 +4,8 @@ backsh \- Backup shell
 
 .SH SYNOPSIS
 .B backsh
-.I directory
-.I filename
+-B -c
+.I directory/filename
 
 .SH DESCRIPTION
 .B backsh
@@ -42,9 +42,15 @@ user.
 Specifies the base name of the file to be created.
 The current timestamp will be prepended to this name,
 as a measure to prevent the deletion of old existing backup files.
+The filename shall be separated from the rest of the
+directory path with a slash.
 
 .SH OPTIONS
 The command does not accept any options.
+The obligatory
+.B -c
+command-line argument is required for compatibility with the remote shell
+invocation method.
 
 .SH EXIT STATUS
 .TP
@@ -56,29 +62,23 @@ An error occurred during execution.
 See error messages for details.
 
 .SH EXAMPLES
-Create a file with the standard input data in /tmp directory with a base name of
-.BR output.txt :
+After configuring on the
+.I backup-host.example.com
+host the
+.I backsh
+user to use
+.I backsh
+as its shell,
+create a file with the standard input data in the
+.I backup-files
+directory with a base name of
+.BR backup.tar.gz :
 .EX
 [backup-client]$ tar czf - . |
-> ssh backsh@backup-host.example.com backup-files backup.tar.gz
+> ssh backsh@backup-host.example.com backup-files/backup.tar.gz
 [backup-host]$ ls backup-files
 20231214Z123456-backup.tar.gz
 .EE
-
-.SH ERRORS
-The following errors may occur:
-.TP
-.B "File path too long"
-The combined directory, timestamp, and filename exceed the system’s path length limit.
-.TP
-.B "Error opening file"
-The file could not be created due to permissions or other system errors.
-.TP
-.B "Error reading from stdin"
-An error occurred while reading input.
-.TP
-.B "Error writing to file"
-An error occurred while writing data to the file.
 
 .SH SEE ALSO
 .BR ssh (2),
