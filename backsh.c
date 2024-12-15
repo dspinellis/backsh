@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
@@ -54,10 +55,11 @@ main(int argc, char *argv[])
 	char timestamp[16]; // YYYYMMDDZHHMMSS\0
 	time_t now = time(NULL);
 	struct tm *tm_info = gmtime(&now); // Use gmtime for UTC (Z)
-	strftime(timestamp, size, "%Y%m%dZ%H%M%S", tm_info);
+	strftime(timestamp, sizeof(timestamp), "%Y%m%dZ%H%M%S", tm_info);
 
 	char filepath[PATH_MAX];
-	if (snprintf(filepath, sizeof(filepath), "%s/%s-%s", directory, timestamp, filename) >= sizeof(filepath)) {
+	int n = snprintf(filepath, sizeof(filepath), "%s/%s-%s", directory, timestamp, filename);
+	if (n < 0 || (unsigned long)n >= sizeof(filepath)) {
 		fprintf(stderr, "File path too long\n");
 		exit(EXIT_FAILURE);
 	}

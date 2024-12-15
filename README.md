@@ -5,7 +5,7 @@ allowing potentially untrusted clients to backup data to the
 specified directory,
 without providing them remote access to a command shell or the ability to
 delete existing backup files.
-Consult the provided manual page for more information.
+Consult [the provided manual page](https://dspinellis.github.io/manview/?src=https://raw.githubusercontent.com/dspinellis/backsh/refs/heads/main/backsh.1) for more information.
 
 ## Installation
 make install
