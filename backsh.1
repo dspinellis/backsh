@@ -1,0 +1,93 @@
+.TH backsh 1 "December 14, 2024" "1.0" "User Commands"
+.SH NAME
+backsh \- Backup shell
+
+.SH SYNOPSIS
+.B backsh
+.I directory
+.I filename
+
+.SH DESCRIPTION
+.B backsh
+reads data from its standard input and writes the data to a file
+in the specified
+.I directory
+with the specified
+.I filename
+prepended by the current timestamp in the format
+.BR "YYYYMMDDZHHMMSS" .
+The resulting file will be located at:
+
+.IR "directory/YYYYMMDDZHHMMSS-filename" .
+
+The program creates files with permissions set to 0600.
+
+It is intended to be specified as a shell in a remote backup host computer,
+allowing potentially untrusted clients to backup data to the
+specified directory,
+without providing them remote access to a command shell or the ability to
+delete existing backup files.
+Note that it is still possible for a compromised backup client
+to cause a denial of service attack by writing too many files,
+or by filling up the backup host's disk space.
+
+.SH ARGUMENTS
+.TP
+.I directory
+Specifies the target directory where the file will be created.
+This directory must already exist and be writable by the shell's
+user.
+.TP
+.I filename
+Specifies the base name of the file to be created.
+The current timestamp will be prepended to this name,
+as a measure to prevent the deletion of old existing backup files.
+
+.SH OPTIONS
+The command does not accept any options.
+
+.SH EXIT STATUS
+.TP
+.B 0
+Successful execution.
+.TP
+.B 1
+An error occurred during execution.
+See error messages for details.
+
+.SH EXAMPLES
+Create a file with the standard input data in /tmp directory with a base name of
+.BR output.txt :
+.EX
+[backup-client]$ tar czf - . |
+> ssh backsh@backup-host.example.com backup-files backup.tar.gz
+[backup-host]$ ls backup-files
+20231214Z123456-backup.tar.gz
+.EE
+
+.SH ERRORS
+The following errors may occur:
+.TP
+.B "File path too long"
+The combined directory, timestamp, and filename exceed the system’s path length limit.
+.TP
+.B "Error opening file"
+The file could not be created due to permissions or other system errors.
+.TP
+.B "Error reading from stdin"
+An error occurred while reading input.
+.TP
+.B "Error writing to file"
+An error occurred while writing data to the file.
+
+.SH SEE ALSO
+.BR ssh (2),
+.BR passwd (5)
+
+.SH AUTHOR
+Written by Diomidis Spinellis.
+
+.SH COPYRIGHT
+Copyright \(co 2024 Diomidis Spinellis.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the Apache Software License.
